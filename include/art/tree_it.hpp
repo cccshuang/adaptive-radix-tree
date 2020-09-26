@@ -91,19 +91,16 @@ tree_it<T> tree_it<T>::greater_equal(node<T> *root, const char *key) {
     cur = node_stack.top();
     cur_depth = depth_stack.top();
 
-    if (cur_depth == key_len) {
-        return tree_it<T>(node_stack);
+    i = cur->check_prefix(key + cur_depth, key_len - cur_depth);
+    if (cur_depth + i == key_len /* + 1 */) {
+      /* key too short => subtree matches */
+      return tree_it<T>(node_stack);
     }
-    for (i = 0; i < cur->prefix_len_; ++i) {
-      if (cur_depth + i == key_len) {
-        return tree_it<T>(node_stack);
-      }
-      if (cur->prefix_[i] < key[cur_depth + i]) {
-        node_stack.pop();
-        /* optional because depth_stack is not used outside this method */
-        /* depth_stack.pop(); */
-        return tree_it<T>(node_stack);
-      }
+    if (cur->prefix_[i] < key[cur_depth + i]) {
+      node_stack.pop();
+      /* optional because depth_stack is not used outside this method */
+      /* depth_stack.pop(); */
+      return tree_it<T>(node_stack);
     }
     node_stack.pop();
     depth_stack.pop();
